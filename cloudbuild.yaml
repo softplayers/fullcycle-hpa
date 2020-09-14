@@ -1,0 +1,13 @@
+steps:
+
+- id: 'Exec unit tests'
+  name: 'gcr.io/cloud-builders/go'
+  args: ['test', 'app']
+  env: 
+    - 'GOPATH=.'
+
+- id: 'Build image'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/go-hpa', '.']
+
+images: ['gcr.io/$PROJECT_ID/go-hpa']
