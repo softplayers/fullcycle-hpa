@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-hpa
+spec:
+  replicas: 1
+
+  selector: # usado pelo service
+    matchLabels:
+      app: go-hpa
+  
+  template:
+    metadata:
+      labels: 
+        app: go-hpa
+    spec:
+      containers:
+        - image: softplayers/go-hpa
+          name: go-hpa
+          ports:
+            - containerPort: 8000
+          
+          resources:
+              requests:
+                cpu: "50m"
+              limits:
+                cpu: "100m"
+
