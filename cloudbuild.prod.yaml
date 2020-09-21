@@ -1,0 +1,33 @@
+steps:
+
+- id: 'Exec unit tests'
+  name: 'gcr.io/cloud-builders/go'
+  args: ['test', 'app']
+  env: 
+    - 'GOPATH=.'
+
+- id: 'Build image'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/go-hpa', '.']
+
+
+- id: "Adjusting Deployment file - k8s"
+  name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: '/bin/sh'
+  args:
+    - '-c'
+    - |
+      sed 's#softplayers/go-hpa#gcr.io/$PROJECT_ID/go-hpa#g' k8s/deployment.yaml > k8s/deployment-new.yaml
+      cat k8s/deployment-new.yaml;
+
+- id: "Deploying K8s"
+  name: 'gcr.io/cloud-builders/kubectl'
+  args:
+    - 'apply'
+    - '-f'
+    - 'k8s'
+  env:
+    - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=my-first-cluster-2'
+
+images: ['gcr.io/$PROJECT_ID/go-hpa']
